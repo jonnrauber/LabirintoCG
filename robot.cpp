@@ -1,11 +1,6 @@
-#include <GL/glut.h>
-#define MAX 100
-#define TAM_VISUALIZACAO 30
+#include "robot.h"
 
-#define TAM_CABECA 4
-
-
-GLUquadricObj* quadric = gluNewQuadric();
+#define TAM_CABECA 4	
 
 void DesenhaCorpo() {
 	GLfloat v[8][3] = {
@@ -61,18 +56,8 @@ void DesenhaPe() {
 	glEnd();
 }
 
-
-void DesenhaRobot() {
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	
-	gluLookAt(5.0, 5.0, -50.0, 
-				0.0, 0.0, 0.0, 
-				0.0, 1.0, 0.0);
-	
-	glColor3f(0.9f, 0.9f, 0.9f);
-	
+void DesenhaRobot(robot *Robot) {
+	glColor3f(0.9f, 0.9f, 0.9f); //cor cinza
 	
 	//desenha o corpo
 	glPushMatrix();
@@ -83,7 +68,7 @@ void DesenhaRobot() {
 	glPushMatrix();
 		glTranslatef(0.0f, 6.5f, 0.0f);
 		glRotatef(90.0f, 1.0f, 0.0f, 0.0f);
-		gluCylinder(quadric, 0.75, 0.75, 1.5, 20, 10);
+		gluCylinder(Robot->quadric, 0.75, 0.75, 1.5, 20, 10);
 	glPopMatrix();
 	
 	//desenha cabeça
@@ -93,109 +78,133 @@ void DesenhaRobot() {
 	glPopMatrix();	
 	
 	//desenha os braços
+	///braco direito
 	glPushMatrix();
+		glRotatef(Robot->rot_braco_dir, 1, 0, 0);
 		glTranslatef(3.5f, 4.0f, 0.0f);
 		glRotatef(90.0f, 1.0f, 0.3f, 0.0f);
-		gluCylinder(quadric, 0.75, 0.75, 7.0, 20, 10);
+		gluCylinder(Robot->quadric, 0.75, 0.75, 7.0, 20, 10);
 	glPopMatrix();
+	///braco esquerdo
 	glPushMatrix();
+		glRotatef(Robot->rot_braco_esq, 1, 0, 0);
 		glTranslatef(-3.5f, 4.0f, 0.0f);
 		glRotatef(90.0f, 1.0f, -0.3f, 0.0f);
-		gluCylinder(quadric, 0.75, 0.75, 7.0, 20, 10);
+		gluCylinder(Robot->quadric, 0.75, 0.75, 7.0, 20, 10);
 	glPopMatrix();
 	
 	
 	/* desenha os membros inferiores */
 	
-	//coxas
+	///membros direitos
 	glPushMatrix();
-		glTranslatef(1.5f, -5.0f, 0.0f);
-		glRotatef(90.0f, 1.0f, 0.05f, 0.0f);
-		gluCylinder(quadric, 0.75, 0.75, 3.5, 20, 10);
+		glRotatef(Robot->rot_perna_dir, 1, 0, 0);
+		//coxa direita
+		glPushMatrix();
+			glTranslatef(1.5f, -5.0f, 0.0f);
+			glRotatef(90.0f, 1.0f, 0.05f, 0.0f);
+			gluCylinder(Robot->quadric, 0.75, 0.75, 3.5, 20, 10);
+		glPopMatrix();
+		//canela direita
+		glPushMatrix();
+			glTranslatef(1.5f, -8.5f, 0.0f);
+			glRotatef(90.0f, 1.0f, -0.05f, 0.0f);
+			gluCylinder(Robot->quadric, 0.75, 0.75, 3.0, 20, 10);
+		glPopMatrix();
+		//pé direito
+		glPushMatrix();
+			glTranslatef(1.5f, -11.75f, 0.0f);
+			DesenhaPe();
+		glPopMatrix();
 	glPopMatrix();
+	///membros esquerdos
 	glPushMatrix();
-		glTranslatef(-1.5f, -5.0f, 0.0f);
-		glRotatef(90.0f, 1.0f, -0.05f, 0.0f);
-		gluCylinder(quadric, 0.75, 0.75, 3.5, 20, 10);
+		glRotatef(Robot->rot_perna_esq, 1, 0, 0);
+		//coxa esquerda
+		glPushMatrix();
+			glTranslatef(-1.5f, -5.0f, 0.0f);
+			glRotatef(90.0f, 1.0f, -0.05f, 0.0f);
+			gluCylinder(Robot->quadric, 0.75, 0.75, 3.5, 20, 10);
+		glPopMatrix();
+		//canela esquerda
+		glPushMatrix();
+			glTranslatef(-1.5f, -8.5f, 0.0f);
+			glRotatef(90.0f, 1.0f, 0.05f, 0.0f);
+			gluCylinder(Robot->quadric, 0.75, 0.75, 3.0, 20, 10);
+		glPopMatrix();
+		//pé esquerdo
+		glPushMatrix();
+			glTranslatef(-1.5f, -11.75f, 0.0f);
+			DesenhaPe();
+		glPopMatrix();
 	glPopMatrix();
+}
+
+robot* inicializaRobot() {
+	robot* Robot = (robot *)malloc(sizeof(robot *));
+	Robot->rot_perna_dir = 0;
+	Robot->rot_perna_esq = 0;
+	Robot->rot_braco_dir = 0;
+	Robot->rot_braco_esq = 0;
+	Robot->movendo_pernas = 0;
+	Robot->quadric = gluNewQuadric();
 	
-	//canelas
-	glPushMatrix();
-		glTranslatef(1.5f, -8.5f, 0.0f);
-		glRotatef(90.0f, 1.0f, -0.05f, 0.0f);
-		gluCylinder(quadric, 0.75, 0.75, 3.0, 20, 10);
-	glPopMatrix();
-	glPushMatrix();
-		glTranslatef(-1.5f, -8.5f, 0.0f);
-		glRotatef(90.0f, 1.0f, 0.05f, 0.0f);
-		gluCylinder(quadric, 0.75, 0.75, 3.0, 20, 10);
-	glPopMatrix();
+	return Robot;	
+}
+
+void liberaRobot(robot *Robot) {
+	free(Robot);
+}
+
+void DesenhaRobot2() {
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
-	//pés
-	glPushMatrix();
-		glTranslatef(1.5f, -11.75f, 0.0f);
-		DesenhaPe();
-	glPopMatrix();
-	glPushMatrix();
-		glTranslatef(-1.5f, -11.75f, 0.0f);
-		DesenhaPe();
-	glPopMatrix();
+	gluLookAt(5.0, 5.0, -50.0, 
+				0.0, 0.0, 0.0, 
+				0.0, 1.0, 0.0);
+	
+	//DesenhaRobot(Robot);
 	
 	glutSwapBuffers();
 }
 
-
-void AlteraTamanhoJanela(GLsizei w, GLsizei h) { 
-    // Especifica as dimensões da Viewport
-    if (h == 0) h=1;
-    
-    glViewport(0, 0, w, h);
-    //W = w;
-    //H = h;                   
-
-    // Inicializa o sistema de coordenadas
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    
-	// Estabelece a janela de sele��o (left, right, bottom, top)
-	//if (w <= h)
-		//glOrtho(-TAM_VISUALIZACAO, TAM_VISUALIZACAO, -TAM_VISUALIZACAO, TAM_VISUALIZACAO*h / w, -TAM_VISUALIZACAO, TAM_VISUALIZACAO);
-	//else
-		//glOrtho(-TAM_VISUALIZACAO, TAM_VISUALIZACAO*w / h, -TAM_VISUALIZACAO, TAM_VISUALIZACAO, -TAM_VISUALIZACAO, TAM_VISUALIZACAO);
-		
-	gluPerspective(45, w/h, 1, 100);
-}
-
-void Inicializa() {
+void Inicializa1() {
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
 }
 
-/**
- * Função Main
- * */
-int main(int argc, char *argv[]) {
-	//inicialização dos módulos Glut
-	glutInit(&argc, argv);
-	
-	//inicializa os modos de Buffer Duplo, cores RGB e profundidade
-    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);  
-    
-    //configuração e inicialização da janela
-	glutInitWindowSize(800, 600);
-	glutInitWindowPosition(10,10);
-	glutCreateWindow("Labirinto");
-	
-	Inicializa();
-	
-	//definição da CallBack de desenho
-	glutDisplayFunc(DesenhaRobot);
-	//definição da CallBack de redimensionamento da janela
-	glutReshapeFunc(AlteraTamanhoJanela);
-	
-	//laço de execução infinito
-	glutMainLoop();
-	
-	return 0;
+void move_pernas(robot *Robot) {
+	switch(Robot->movendo_pernas) {
+		case 1:
+		case 2:
+			Robot->rot_perna_dir = 30;
+			Robot->rot_perna_esq = -15;
+			Robot->rot_braco_dir = -15;
+			Robot->rot_braco_esq = 30;
+			Robot->movendo_pernas++;
+			break;
+		case 3:
+		case 4:
+			Robot->rot_perna_dir = -15;
+			Robot->rot_perna_esq = 30;
+			Robot->rot_braco_dir = 30;
+			Robot->rot_braco_esq = -15;
+			Robot->movendo_pernas++;
+			break;
+		case 5:
+		case 6:
+			Robot->rot_perna_dir = 0;
+			Robot->rot_perna_esq = 0;
+			Robot->rot_braco_dir = 0;
+			Robot->rot_braco_esq = 0;
+			Robot->movendo_pernas++;
+			break;
+		default:
+			Robot->movendo_pernas = 0;
+			break;		
+	}
+	glutPostRedisplay();
 }

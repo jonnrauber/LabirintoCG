@@ -1,14 +1,16 @@
 #include <GL/glut.h>
 #include <stdio.h>
 #include <math.h>
+#include "robot.h"
 
-#define MAX 300.0
-
-#define TAM_BLOCO 10
+#define MAX 400.0
+#define FPS 30
+#define TAM_BLOCO 20
 #define TAM_MAPA 15
+#define TAM_MUNDO 1000
 
 GLfloat angulo = 90.0;
-GLfloat posX = 15, posZ = 15;
+GLfloat posX = TAM_BLOCO*1.5, posZ = TAM_BLOCO*1.5;
 GLfloat zoomAereo = 0; 
 
 GLfloat rad = 57.2958;
@@ -32,13 +34,11 @@ GLfloat mapa[TAM_MAPA][TAM_MAPA] = {
 		{1,0,1,0,1,0,1,0,0,0,0,0,0,0,1},
 		{1,0,1,0,1,0,1,0,0,0,0,0,0,0,1},
 		{1,0,1,0,1,0,0,0,0,0,0,0,0,0,1},
-		{1,0,1,0,1,0,1,0,0,0,0,0,0,0,1},
+		{0,0,1,0,1,0,1,0,0,0,0,0,0,0,1},
 		{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
 	};
 
-void DesenhaRobo() {
-	
-}
+robot *Robot;
 
 void DesenhaParedes() {
 	int x, z;
@@ -63,14 +63,14 @@ void DesenhaParedes() {
 }
 
 void DesenhaMapa() {
-	glColor3f(0.0f, 1.0f, 0.0f);
+	glColor3f(0.5f, 1.0f, 0.5f);
 	
 	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, luz_chao);
 	glBegin(GL_QUADS);
-		glVertex3f(0, 0, 0);
-		glVertex3f(0, 0, TAM_MAPA*TAM_BLOCO);
-		glVertex3f(TAM_MAPA*TAM_BLOCO, 0, TAM_MAPA*TAM_BLOCO);
-		glVertex3f(TAM_MAPA*TAM_BLOCO, 0, 0);
+		glVertex3f(-TAM_MUNDO*TAM_BLOCO, 0, -TAM_MUNDO*TAM_BLOCO);
+		glVertex3f(-TAM_MUNDO*TAM_BLOCO, 0, TAM_MUNDO*TAM_BLOCO);
+		glVertex3f(TAM_MUNDO*TAM_BLOCO, 0, TAM_MUNDO*TAM_BLOCO);
+		glVertex3f(TAM_MUNDO*TAM_BLOCO, 0, -TAM_MUNDO*TAM_BLOCO);
 	glEnd();
 }
 
@@ -80,8 +80,8 @@ void Desenha() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
 	if (cam == ATRAS_ROBO) {
-		gluLookAt(posX,TAM_BLOCO/2,posZ, 
-					posX + 10*sin(angulo/rad), 5 , posZ + 10*cos(angulo/rad), 
+		gluLookAt(posX - 10, TAM_BLOCO/2 + 10, posZ - 10, 
+					posX + TAM_BLOCO*sin(angulo/rad), TAM_BLOCO/2 , posZ + TAM_BLOCO*cos(angulo/rad), 
 					0,1,0);
 		
 	} else {
@@ -95,6 +95,10 @@ void Desenha() {
 	glPopMatrix();
 	
 	DesenhaParedes();
+	
+	glTranslatef(posX, TAM_BLOCO/2, posZ);
+	glRotatef(angulo, 0, 1, 0);
+	DesenhaRobot(Robot);
 	
 	glutSwapBuffers();
 }
@@ -152,6 +156,7 @@ void InicializaIluminacao() {
 
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
+	glEnable(GL_COLOR_MATERIAL);
 	
 }
 
@@ -179,42 +184,50 @@ void AlteraTamanhoJanela(GLsizei w, GLsizei h) {
 }
 
 void GerenciaTecladoEspecial(int key, int x, int y) {
-	
-	if (cam == ATRAS_ROBO) {
-		if (key == GLUT_KEY_UP) {
-			posX += sin(angulo/rad);
-			posZ += cos(angulo/rad); 
-			
-		} else if (key == GLUT_KEY_DOWN) {
-			posX -= sin(angulo/rad);
-			posZ -= cos(angulo/rad); 
-			
-		} else if (key == GLUT_KEY_RIGHT) {
-			angulo -= 5;
-		}
-		else if (key == GLUT_KEY_LEFT) {
-			angulo += 5;
-		}
-		else return;
+	if(key == GLUT_KEY_UP) {
+		posX += sin(angulo/rad);
+		posZ += cos(angulo/rad);
+		Robot->movendo_pernas = 1;
 	}
-	else if (cam == PANORAMICA) {
-		if (key == GLUT_KEY_UP)
-			if (zoomAereo > 0)
-				zoomAereo -= 1;
-		if (key == GLUT_KEY_DOWN)
-			if (zoomAereo < 200)
-				zoomAereo += 1;
-		else return;
-	}
+	else if(key == GLUT_KEY_DOWN) {
+		posX -= sin(angulo/rad);
+		posZ -= cos(angulo/rad);
+		Robot->movendo_pernas = 1;
+	} 
+	else if (key == GLUT_KEY_RIGHT) {
+		angulo -= 5;
+	} 
+	else if (key == GLUT_KEY_LEFT) {
+		angulo += 5;
+	} else return;
 	
 	glutPostRedisplay();
 	
+}
+
+void GerenciaTeclado(unsigned char key, int x, int y) {
+	if (cam == PANORAMICA) {
+		if (key == '+') {
+			zoomAereo -= 10;
+		} else if (key == '-') {
+			zoomAereo += 10;
+		} else return;
+	}
+	glutPostRedisplay();
+}
+
+void Timer(int a) {
+	if (Robot->movendo_pernas)
+		move_pernas(Robot);
+	glutPostRedisplay();
+	glutTimerFunc(1000.0/FPS, Timer, 1);
 }
 
 /**
  * Função Main
  * */
 int main(int argc, char *argv[]) {
+	Robot = inicializaRobot();
 	//inicialização dos módulos Glut
 	glutInit(&argc, argv);
 	
@@ -235,11 +248,18 @@ int main(int argc, char *argv[]) {
 	
 	//definição da CallBack de controle do mouse
 	glutMouseFunc(GerenciaMouse);
-	
+	//definição da CallBack de controle das teclas especiais
 	glutSpecialFunc(GerenciaTecladoEspecial);
+	//definição da CallBack de controle do teclado (ASCII)
+	glutKeyboardFunc(GerenciaTeclado);
+	//definição da CallBack de Timer
+	glutTimerFunc(1000.0/FPS, Timer, 1);
+	
 	
 	//laço de execução infinito
 	glutMainLoop();
+	
+	liberaRobot(Robot);
 	
 	return 0;
 }
