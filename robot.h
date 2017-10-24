@@ -3,8 +3,6 @@
 
 #include <GL/glut.h>
 
-#define TAM_CABECA 4
-
 typedef struct robot {
 	GLfloat rot_perna_dir;
 	GLfloat rot_perna_esq;

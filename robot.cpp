@@ -1,17 +1,16 @@
+#include "defs.h"
 #include "robot.h"
-
-#define TAM_CABECA 4	
 
 void DesenhaCorpo() {
 	GLfloat v[8][3] = {
-			{-3.5, -5, 2},
-			{3.5, -5, 2},
-			{3.5, 5, 2},
-			{-3.5, 5, 2},
-			{-3.5, -5, -2},
-			{3.5, -5, -2},
-			{3.5, 5, -2},
-			{-3.5, 5, -2}
+			{-LARGURA_CORPO/2.0, -ALTURA_CORPO/2.0, LARGURA_CORPO/3.5},
+			{LARGURA_CORPO/2.0, -ALTURA_CORPO/2.0, LARGURA_CORPO/3.5},
+			{LARGURA_CORPO/2.0, ALTURA_CORPO/2.0, LARGURA_CORPO/3.5},
+			{-LARGURA_CORPO/2.0, ALTURA_CORPO/2.0, LARGURA_CORPO/3.5},
+			{-LARGURA_CORPO/2.0, -ALTURA_CORPO/2.0, -LARGURA_CORPO/3.5},
+			{LARGURA_CORPO/2.0, -ALTURA_CORPO/2.0, -LARGURA_CORPO/3.5},
+			{LARGURA_CORPO/2.0, ALTURA_CORPO/2.0, -LARGURA_CORPO/3.5},
+			{-LARGURA_CORPO/2.0, ALTURA_CORPO/2.0, -LARGURA_CORPO/3.5}
 		};	
 		
 	glBegin(GL_QUADS);
@@ -31,14 +30,14 @@ void DesenhaCorpo() {
 
 void DesenhaPe() {
 	GLfloat v[8][3] = {
-			{-0.75, -0.25, 2},
-			{0.75, -0.25, 2},
-			{0.75, 0.25, 2},
-			{-0.75, 0.25, 2},
-			{-0.75, -0.25, -2},
-			{0.75, -0.25, -2},
-			{0.75, 0.25, -2},
-			{-0.75, 0.25, -2}
+			{-TAM_PE/6.0, -TAM_PE/8.0, TAM_PE/2.0},
+			{TAM_PE/6.0, -TAM_PE/8.0, TAM_PE/2.0},
+			{TAM_PE/6.0, TAM_PE/8.0, TAM_PE/2.0},
+			{-TAM_PE/6.0, TAM_PE/8.0, TAM_PE/2.0},
+			{-TAM_PE/6.0, -TAM_PE/8.0, -TAM_PE/2.0},
+			{TAM_PE/6.0, -TAM_PE/8.0, -TAM_PE/2.0},
+			{TAM_PE/6.0, TAM_PE/8.0, -TAM_PE/2.0},
+			{-TAM_PE/6.0, TAM_PE/8.0, -TAM_PE/2.0}
 		};	
 		
 	glBegin(GL_QUADS);
@@ -57,40 +56,116 @@ void DesenhaPe() {
 }
 
 void DesenhaRobot(robot *Robot) {
-	glColor3f(0.9f, 0.9f, 0.9f); //cor cinza
+	
+	glTranslatef(0.0f, 11.5, 0.0f);
 	
 	//desenha o corpo
 	glPushMatrix();
+		glColor3f(0.9f, 0.9f, 0.9f); //cor cinza
 		DesenhaCorpo();
+		
+		//antenas ombros
+		glPushMatrix();
+			glTranslatef(LARGURA_CORPO/2.5, ALTURA_CORPO/2.0, 0);
+			glRotatef(-30, 0, 0, 1);
+			glRotatef(-90, 1, 0, 0);
+			gluCylinder(Robot->quadric, 0.1, 0.1, ALTURA_CORPO/2.0, 20, 10);
+			glutSolidSphere(RAIO_ANTENA, 30, 10);
+		glPopMatrix();
+		//antenas ombros
+		glPushMatrix();
+			glTranslatef(-LARGURA_CORPO/2.5, ALTURA_CORPO/2.0, 0);
+			glRotatef(30, 0, 0, 1);
+			glRotatef(-90, 1, 0, 0);
+			gluCylinder(Robot->quadric, 0.1, 0.1, ALTURA_CORPO/2.0, 20, 10);
+			glutSolidSphere(RAIO_ANTENA, 30, 10);
+		glPopMatrix();
+		
 	glPopMatrix();
 	
 	//desenha pescoço
 	glPushMatrix();
+		glColor3f(0.9f, 0.9f, 0.9f); //cor cinza	
 		glTranslatef(0.0f, 6.5f, 0.0f);
 		glRotatef(90.0f, 1.0f, 0.0f, 0.0f);
-		gluCylinder(Robot->quadric, 0.75, 0.75, 1.5, 20, 10);
+		gluCylinder(Robot->quadric, RAIO_PESCOCO, RAIO_PESCOCO, 1.5, 20, 10);
 	glPopMatrix();
 	
 	//desenha cabeça
 	glPushMatrix();
-		glTranslatef(0.0f, 8.5f, 0.0f);
+		glColor3f(0.5, 0.5, 0.5);
+		glTranslatef(0, 8.5, 0);
 		glutSolidCube(TAM_CABECA);
+		glColor3f(1, 0, 0);
+		
+		glPushMatrix();
+			//glTranslatef(TAM_CABECA/2.0, 0, 0);
+			//gluCylinder(Robot->quadric, COMPRIMENTO_ORELHAS/2.0, 0, COMPRIMENTO_ORELHAS, 20, 10);
+		glPopMatrix();
+		
+		glPushMatrix();
+			glTranslatef(0, 0, -TAM_CABECA/2.0);
+			//olho esquerdo
+			glPushMatrix();
+				glTranslatef(-TAM_CABECA/6.0, TAM_CABECA/8.0, 0);
+				glutSolidSphere(RAIO_OLHOS, 30, 10);
+			glPopMatrix();
+			
+			//olho direito
+			glPushMatrix();
+				glTranslatef(TAM_CABECA/6.0, TAM_CABECA/8.0, 0);
+				glutSolidSphere(RAIO_OLHOS, 30, 10);
+			glPopMatrix();
+			
+			//sorriso
+			glPushMatrix();
+				glTranslatef(0, -TAM_CABECA/4.0, 0);
+				glScalef(LARGURA_SORRISO, ALTURA_SORRISO, 0.25);
+				glutSolidCube(1);
+			glPopMatrix();
+		glPopMatrix();
 	glPopMatrix();	
 	
 	//desenha os braços
 	///braco direito
 	glPushMatrix();
-		glRotatef(Robot->rot_braco_dir, 1, 0, 0);
-		glTranslatef(3.5f, 4.0f, 0.0f);
+		glColor3f(0.9f, 0.9f, 0.9f); //cor cinza
+		glTranslatef(LARGURA_CORPO/2.0, ALTURA_CORPO/2.5, 0.0f);
+		gluSphere(Robot->quadric, 0.75, 20, 10);
 		glRotatef(90.0f, 1.0f, 0.3f, 0.0f);
-		gluCylinder(Robot->quadric, 0.75, 0.75, 7.0, 20, 10);
+		glRotatef(Robot->rot_braco_dir, 1, 0, 0);
+		gluCylinder(Robot->quadric, 0.75, 0.75, COMPRIMENTO_BRACO, 20, 10);
+		glTranslatef(0, 0, COMPRIMENTO_BRACO);
+		
+		//cotovelo
+		glPushMatrix();
+			glTranslatef(0, -GROSSURA_BRACO/4.0, GROSSURA_BRACO/2.0);
+			glScalef(1, 1, 0.5);
+			gluSphere(Robot->quadric, GROSSURA_BRACO*1.25, 20, 10);
+		glPopMatrix();
+		
+		glRotatef(30, 1, 0, 0);
+		gluCylinder(Robot->quadric, GROSSURA_BRACO/1.1, GROSSURA_BRACO/1.5, COMPRIMENTO_BRACO, 20, 10);
 	glPopMatrix();
 	///braco esquerdo
 	glPushMatrix();
-		glRotatef(Robot->rot_braco_esq, 1, 0, 0);
-		glTranslatef(-3.5f, 4.0f, 0.0f);
+		glColor3f(0.9f, 0.9f, 0.9f); //cor cinza
+		glTranslatef(-LARGURA_CORPO/2.0, ALTURA_CORPO/2.5, 0.0f);
+		gluSphere(Robot->quadric, 0.75, 20, 10);
 		glRotatef(90.0f, 1.0f, -0.3f, 0.0f);
-		gluCylinder(Robot->quadric, 0.75, 0.75, 7.0, 20, 10);
+		glRotatef(Robot->rot_braco_esq, 1, 0, 0);
+		gluCylinder(Robot->quadric, GROSSURA_BRACO, GROSSURA_BRACO, COMPRIMENTO_BRACO, 20, 10);
+		glTranslatef(0, 0, COMPRIMENTO_BRACO);
+		
+		//cotovelo
+		glPushMatrix(); 
+			glTranslatef(0, -GROSSURA_BRACO/4.0, GROSSURA_BRACO/2.0);
+			glScalef(1, 1, 0.5);
+			gluSphere(Robot->quadric, GROSSURA_BRACO*1.25, 20, 10);
+		glPopMatrix();
+		
+		glRotatef(30, 1, 0, 0);
+		gluCylinder(Robot->quadric, GROSSURA_BRACO/1.1, GROSSURA_BRACO/1.5, COMPRIMENTO_BRACO, 20, 10);
 	glPopMatrix();
 	
 	
@@ -98,43 +173,49 @@ void DesenhaRobot(robot *Robot) {
 	
 	///membros direitos
 	glPushMatrix();
+		glColor3f(0.9f, 0.9f, 0.9f); //cor cinza
 		glRotatef(Robot->rot_perna_dir, 1, 0, 0);
 		//coxa direita
 		glPushMatrix();
 			glTranslatef(1.5f, -5.0f, 0.0f);
 			glRotatef(90.0f, 1.0f, 0.05f, 0.0f);
-			gluCylinder(Robot->quadric, 0.75, 0.75, 3.5, 20, 10);
+			gluSphere(Robot->quadric, 1, 20, 10);
+			gluCylinder(Robot->quadric, 1, 0.75, 3.5, 20, 10);
 		glPopMatrix();
 		//canela direita
 		glPushMatrix();
 			glTranslatef(1.5f, -8.5f, 0.0f);
 			glRotatef(90.0f, 1.0f, -0.05f, 0.0f);
+			gluSphere(Robot->quadric, 0.75, 20, 10);
 			gluCylinder(Robot->quadric, 0.75, 0.75, 3.0, 20, 10);
 		glPopMatrix();
 		//pé direito
 		glPushMatrix();
-			glTranslatef(1.5f, -11.75f, 0.0f);
+			glTranslatef(1.5f, -11.75f, -0.5f);
 			DesenhaPe();
 		glPopMatrix();
 	glPopMatrix();
 	///membros esquerdos
 	glPushMatrix();
+		glColor3f(0.9f, 0.9f, 0.9f); //cor cinza
 		glRotatef(Robot->rot_perna_esq, 1, 0, 0);
 		//coxa esquerda
 		glPushMatrix();
 			glTranslatef(-1.5f, -5.0f, 0.0f);
 			glRotatef(90.0f, 1.0f, -0.05f, 0.0f);
-			gluCylinder(Robot->quadric, 0.75, 0.75, 3.5, 20, 10);
+			gluSphere(Robot->quadric, 0.75, 20, 10);
+			gluCylinder(Robot->quadric, 1, 0.75, 3.5, 20, 10);
 		glPopMatrix();
 		//canela esquerda
 		glPushMatrix();
 			glTranslatef(-1.5f, -8.5f, 0.0f);
 			glRotatef(90.0f, 1.0f, 0.05f, 0.0f);
+			gluSphere(Robot->quadric, 0.75, 20, 10);
 			gluCylinder(Robot->quadric, 0.75, 0.75, 3.0, 20, 10);
 		glPopMatrix();
 		//pé esquerdo
 		glPushMatrix();
-			glTranslatef(-1.5f, -11.75f, 0.0f);
+			glTranslatef(-1.5f, -11.75f, -0.5f);
 			DesenhaPe();
 		glPopMatrix();
 	glPopMatrix();
@@ -177,25 +258,27 @@ void Inicializa1() {
 }
 
 void move_pernas(robot *Robot) {
+	if (Robot->movendo_pernas) {
+		
+	}
 	switch(Robot->movendo_pernas) {
 		case 1:
 		case 2:
-			Robot->rot_perna_dir = 30;
-			Robot->rot_perna_esq = -15;
-			Robot->rot_braco_dir = -15;
+			Robot->rot_perna_dir = 45;
+			Robot->rot_perna_esq = -30;
+			Robot->rot_braco_dir = -30;
 			Robot->rot_braco_esq = 30;
 			Robot->movendo_pernas++;
 			break;
 		case 3:
 		case 4:
-			Robot->rot_perna_dir = -15;
-			Robot->rot_perna_esq = 30;
-			Robot->rot_braco_dir = 30;
-			Robot->rot_braco_esq = -15;
+			Robot->rot_perna_dir = -30;
+			Robot->rot_perna_esq = 45;
+			Robot->rot_braco_dir = 45;
+			Robot->rot_braco_esq = -30;
 			Robot->movendo_pernas++;
 			break;
 		case 5:
-		case 6:
 			Robot->rot_perna_dir = 0;
 			Robot->rot_perna_esq = 0;
 			Robot->rot_braco_dir = 0;
