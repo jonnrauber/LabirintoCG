@@ -1,55 +1,103 @@
 #include "defs.h"
 #include "objeto1.h"
 
-GLfloat luz_objeto1[] = { 0.9, 0.8, 0.7, 1.0 };
-
 void DesenhaObjeto1() {
-	
-	glColor3f(203.0/255, 161.0/255, 56.0/255); //cor marrom
-	
-	/* TAMPO DA MESA */
 	glPushMatrix();
-		//glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, luz_mesa);
-		glTranslatef(0, (ALTURA_MESA+GROSSURA_MESA)/2.0, 0);
-		glScalef(LARGURA_MESA, GROSSURA_MESA, COMPRIMENTO_MESA);
-		glutSolidCube(1);
+		glTranslatef(-4,0,0);
+	    glScalef(1,1,2);
+		glutSolidCube(2);
+	glPopMatrix();
+	glPushMatrix();
+		glTranslatef(1,1,0);
+	    glScalef(4,2,2);
+		glutSolidCube(2);
 	glPopMatrix();
 	
-	/* PÉS DA MESA */
+	glColor3f(0.2f,0.2f,0.2f);
 	glPushMatrix();
-		//glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, luz_mesa);		
-		glTranslatef(LARGURA_MESA/2.0 - GROSSURA_PE/2.0, 0, COMPRIMENTO_MESA/2.0 - GROSSURA_PE/2.0);
-		glScalef(GROSSURA_PE, ALTURA_MESA, GROSSURA_PE);
-		glutSolidCube(1);
+		glTranslatef(-3,-1.3,2);
+        glutSolidTorus(0.5,0.8,20,20);
+	glPopMatrix();
+	glPushMatrix();
+		glTranslatef(3,-1.3,2);
+        glutSolidTorus(0.5,0.8,20,20);
+	glPopMatrix();
+	glPushMatrix();
+		glTranslatef(3,-1.3,-2);
+        glutSolidTorus(0.5,0.8,20,20);
+	glPopMatrix();
+	glPushMatrix();
+		glTranslatef(-3,-1.3,-2);
+        glutSolidTorus(0.5,0.8,20,20);
+	glPopMatrix();
+	
+	glColor3f(0.5f, 0.5f, 0.5f);
+	glPushMatrix();
+        GLUquadricObj *esfera = gluNewQuadric();
+        glTranslatef(-1.2,1.3,2.01);
+        glRotatef(45,0,0,1);
+        glScalef(2.5,2.5,0);
+        gluSphere(esfera, 0.5f, 4, 4);
 	glPopMatrix();
 	
 	glPushMatrix();
-		//glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, luz_mesa);		
-		glTranslatef(LARGURA_MESA/2.0 - GROSSURA_PE/2.0, 0, -(COMPRIMENTO_MESA/2.0 - GROSSURA_PE/2.0));
-		glScalef(GROSSURA_PE, ALTURA_MESA, GROSSURA_PE);
-		glutSolidCube(1);
-	glPopMatrix();
-
-	glPushMatrix();
-		//glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, luz_mesa);		
-		glTranslatef(-(LARGURA_MESA/2.0 - GROSSURA_PE/2.0), 0, COMPRIMENTO_MESA/2.0 - GROSSURA_PE/2.0);
-		glScalef(GROSSURA_PE, ALTURA_MESA, GROSSURA_PE);
-		glutSolidCube(1);
+        GLUquadricObj *esfera2 = gluNewQuadric();
+        glTranslatef(2,1.3,2.01);
+        glRotatef(45,0,0,1);
+        glScalef(2.5,2.5,0);
+        gluSphere(esfera2, 0.5f, 4, 4);
 	glPopMatrix();
 	
 	glPushMatrix();
-		//glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, luz_mesa);		
-		glTranslatef(-(LARGURA_MESA/2.0 - GROSSURA_PE/2.0), 0, -(COMPRIMENTO_MESA/2.0 - GROSSURA_PE/2.0));
-		glScalef(GROSSURA_PE, ALTURA_MESA, GROSSURA_PE);
-		glutSolidCube(1);
+        GLUquadricObj *esfera3 = gluNewQuadric();
+        glTranslatef(-1.2,1.3,-2.01);
+        glRotatef(45,0,0,1);
+        glScalef(2.5,2.5,0);
+        gluSphere(esfera3, 0.5f, 4, 4);
 	glPopMatrix();
 	
-	/* TEAPOT */
 	glPushMatrix();
-		glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, luz_objeto1);	
-		glTranslatef(0, ALTURA_MESA/2.0 + GROSSURA_MESA*1.5, 0);
-		glColor3f(1, 0, 0);
-		glutSolidTeapot(GROSSURA_MESA);
+        GLUquadricObj *esfera4 = gluNewQuadric();
+        glTranslatef(2,1.3,-2.01);
+        glRotatef(45,0,0,1);
+        glScalef(2.5,2.5,0);
+        gluSphere(esfera4, 0.5f, 4, 4);
+	glPopMatrix();
+	
+	glPushMatrix();
+        GLUquadricObj *esfera5 = gluNewQuadric();
+        glTranslatef(-3.1,2,0.7);
+        glRotatef(90,0,1,0);
+        glRotatef(45,0,0,1);
+        glScalef(2.0,2.0,0);
+        gluSphere(esfera5, 0.5f, 4, 4);
+	glPopMatrix();
+	
+	glPushMatrix();
+        GLUquadricObj *esfera6 = gluNewQuadric();
+        glTranslatef(-3.1,2,-0.7);
+        glRotatef(90,0,1,0);
+        glRotatef(45,0,0,1);
+        glScalef(2.0,2.0,0);
+        gluSphere(esfera6, 0.5f, 4, 4);
+	glPopMatrix();
+	
+	glPushMatrix();
+        GLUquadricObj *esfera7 = gluNewQuadric();
+        glTranslatef(5.1,2,0.7);
+        glRotatef(90,0,1,0);
+        glRotatef(45,0,0,1);
+        glScalef(2.0,2.0,0);
+        gluSphere(esfera7, 0.5f, 4, 4);
+	glPopMatrix();
+	
+	glPushMatrix();
+        GLUquadricObj *esfera8 = gluNewQuadric();
+        glTranslatef(5.1,2,-0.7);
+        glRotatef(90,0,1,0);
+        glRotatef(45,0,0,1);
+        glScalef(2.0,2.0,0);
+        gluSphere(esfera8, 0.5f, 4, 4);
 	glPopMatrix();
 }
 

@@ -1,6 +1,7 @@
 #include <GL/glut.h>
 #include <stdio.h>
 #include <math.h>
+#include <stdlib.h>
 #include "defs.h"
 #include "robot.h"
 #include "objeto1.h"
@@ -8,11 +9,12 @@
 GLfloat angulo = 90.0;
 GLfloat posX = TAM_BLOCO*1.5, posZ = TAM_BLOCO*1.5;
 GLfloat zoomAereo = MAX/2.5;
-GLfloat zoomRobot = 10; 
+GLfloat zoomRobot = 16; 
 
 GLfloat rad = 57.2958;
 
 enum camera {PANORAMICA = 1, ATRAS_ROBO = 2} cam;
+enum modo_jogo {MANUAL 	= 1, AUTOMATICO = 2} modo;
 
 GLfloat luz_chao[] = { 0.1, 1.0, 0.0, 1.0 };
 GLfloat luz_parede[] = { 0.9, 0.8, 0.7, 1.0 };
@@ -32,7 +34,7 @@ GLfloat mapa[TAM_MAPA][TAM_MAPA] = {
 		{1,0,1,0,1,0,1,0,1,1,1,0,0,0,1},
 		{1,0,1,0,1,0,1,1,1,0,0,0,1,0,1},
 		{1,0,1,0,1,0,0,0,1,1,0,1,1,0,1},
-		{0,0,1,0,1,0,1,0,0,0,0,0,0,0,1},
+		{1,0,1,0,1,0,1,0,0,0,0,0,0,0,1},
 		{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
 	};
 
@@ -72,8 +74,6 @@ void DesenhaMapa() {
 	glEnd();
 }
 
-
-
 void Desenha() {	
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
@@ -107,7 +107,7 @@ void Desenha() {
 	
 	glPushMatrix();
 		glTranslatef(TAM_BLOCO*9.5, 0, TAM_BLOCO*1.5);
-		//DesenhaObjeto1();
+		DesenhaObjeto1();
 	glPopMatrix();
 	
 	glutSwapBuffers();
@@ -127,16 +127,32 @@ void MenuCamera (int op) {
 	glutPostRedisplay();
 }
 
+void MenuModo (int op) {
+	switch(op) {
+		case 1:
+			modo = MANUAL;
+			break;
+		case 2:
+			modo = AUTOMATICO;
+			break;
+	}
+	glutPostRedisplay();
+}
+
 void MenuPrincipal(int op){}
 
 void CriaMenu() {
-	int submenu1;
+	int submenu1, submenu2;
 	submenu1 = glutCreateMenu(MenuCamera);
 	glutAddMenuEntry("Panoramica", 1);
 	glutAddMenuEntry("Atras do Robo", 2);
+	submenu2 = glutCreateMenu(MenuModo);
+	glutAddMenuEntry("Manual", 1);
+	glutAddMenuEntry("Automatico", 2);
 	
 	glutCreateMenu(MenuPrincipal);
 	glutAddSubMenu("Camera",submenu1);
+	glutAddSubMenu("Modo de Acao",submenu2);
 	
 	glutAttachMenu(GLUT_RIGHT_BUTTON);
 }
@@ -178,6 +194,7 @@ void InicializaIluminacao() {
 
 void Inicializa() {
 	cam = ATRAS_ROBO;
+	modo = AUTOMATICO;
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
@@ -230,6 +247,10 @@ void GerenciaTecladoEspecial(int key, int x, int y) {
 	
 }
 
+/**
+ * Função CallBack que gerencia as interrupções do teclado.
+ * Executa ações referentes ao zoom da câmera e troca de perspectiva.
+ * */
 void GerenciaTeclado(unsigned char key, int x, int y) {
 	if (cam == PANORAMICA) {
 		if (key == '+') {
@@ -239,9 +260,9 @@ void GerenciaTeclado(unsigned char key, int x, int y) {
 		}
 	} else {
 		if (key == '+') {
-			zoomRobot += 5;
-		} else if (key == '-') {
 			zoomRobot -= 5;
+		} else if (key == '-') {
+			zoomRobot += 5;
 		}
 	}
 	
@@ -253,12 +274,44 @@ void GerenciaTeclado(unsigned char key, int x, int y) {
 		}
 	}
 	
+	if (key == 'm' || key == 'M') {
+		if (modo == MANUAL) {
+			modo = AUTOMATICO;			
+		} else if (modo == AUTOMATICO) {
+			modo = MANUAL;
+		}
+	}
+	
 	glutPostRedisplay();
 }
 
+/**
+ * Move o robô automaticamente de acordo com o algoritmo DFS (BUSCA EM PROFUNDIDADE).
+ * */
+void move (void) {
+	int bloco_mapa_x = (int) ((posX + 7*sin(angulo/rad)) / TAM_BLOCO);
+	int bloco_mapa_z = (int) ((posZ + 7*cos(angulo/rad)) / TAM_BLOCO);
+	if (mapa[bloco_mapa_x][bloco_mapa_z] != 1) {
+		posX += sin(angulo/rad);
+		posZ += cos(angulo/rad);
+		if (!Robot->movendo_pernas)
+			Robot->movendo_pernas = 1;
+	} else {
+		angulo = (rand() % 4) * 90;
+	}
+}
+
+/**
+ * Função de Timer
+ * Se o modo selecionado for "AUTOMATICO", o robô tentará encontrar o caminho para o fim do labirinto sozinho.
+ * Caso contrário (modo "MANUAL") somente espera uma ação do usuário.
+ * */
 void Timer(int a) {
+	if (modo == AUTOMATICO)
+		move();
 	if (Robot->movendo_pernas)
 		move_pernas(Robot);
+		
 	glutPostRedisplay();
 	glutTimerFunc(1000.0/FPS, Timer, 1);
 }

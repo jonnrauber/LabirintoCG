@@ -1,6 +1,8 @@
 #include "defs.h"
 #include "robot.h"
 
+GLfloat shininess[] = { 1.0 };
+
 void DesenhaCorpo() {
 	GLfloat v[8][3] = {
 			{-LARGURA_CORPO/2.0, -ALTURA_CORPO/2.0, LARGURA_CORPO/3.5},
@@ -12,23 +14,20 @@ void DesenhaCorpo() {
 			{LARGURA_CORPO/2.0, ALTURA_CORPO/2.0, -LARGURA_CORPO/3.5},
 			{-LARGURA_CORPO/2.0, ALTURA_CORPO/2.0, -LARGURA_CORPO/3.5}
 		};	
-		
+	
+	
 	glBegin(GL_QUADS);
 		glVertex3fv(v[0]); glVertex3fv(v[1]); glVertex3fv(v[2]); glVertex3fv(v[3]);
-		
 		glVertex3fv(v[4]); glVertex3fv(v[5]); glVertex3fv(v[6]); glVertex3fv(v[7]);
-		
 		glVertex3fv(v[1]); glVertex3fv(v[5]); glVertex3fv(v[6]); glVertex3fv(v[2]);
-				
 		glVertex3fv(v[0]); glVertex3fv(v[4]); glVertex3fv(v[7]); glVertex3fv(v[3]);
-		
 		glVertex3fv(v[2]); glVertex3fv(v[6]); glVertex3fv(v[7]); glVertex3fv(v[3]);
-		
 		glVertex3fv(v[0]); glVertex3fv(v[1]); glVertex3fv(v[5]); glVertex3fv(v[4]);
 	glEnd();
 }
 
 void DesenhaPe() {
+	glColor3f(0, 0, 1);
 	GLfloat v[8][3] = {
 			{-TAM_PE/6.0, -TAM_PE/8.0, TAM_PE/2.0},
 			{TAM_PE/6.0, -TAM_PE/8.0, TAM_PE/2.0},
@@ -134,7 +133,7 @@ void DesenhaRobot(robot *Robot) {
 		gluSphere(Robot->quadric, 0.75, 20, 10);
 		glRotatef(90.0f, 1.0f, 0.3f, 0.0f);
 		glRotatef(Robot->rot_braco_dir, 1, 0, 0);
-		gluCylinder(Robot->quadric, 0.75, 0.75, COMPRIMENTO_BRACO, 20, 10);
+		gluCylinder(Robot->quadric, GROSSURA_BRACO, GROSSURA_BRACO, COMPRIMENTO_BRACO, 20, 10);
 		glTranslatef(0, 0, COMPRIMENTO_BRACO);
 		
 		//cotovelo
@@ -146,6 +145,13 @@ void DesenhaRobot(robot *Robot) {
 		
 		glRotatef(30, 1, 0, 0);
 		gluCylinder(Robot->quadric, GROSSURA_BRACO/1.1, GROSSURA_BRACO/1.5, COMPRIMENTO_BRACO, 20, 10);
+		
+		glPushMatrix();
+			glTranslatef(0, 0, COMPRIMENTO_BRACO);
+			glColor3f(0, 0, 1);
+			glScalef(1, 0.75, 0.75);
+			gluSphere(Robot->quadric, GROSSURA_BRACO/1.1*1.25, 20, 10);
+		glPopMatrix();
 	glPopMatrix();
 	///braco esquerdo
 	glPushMatrix();
@@ -166,6 +172,13 @@ void DesenhaRobot(robot *Robot) {
 		
 		glRotatef(30, 1, 0, 0);
 		gluCylinder(Robot->quadric, GROSSURA_BRACO/1.1, GROSSURA_BRACO/1.5, COMPRIMENTO_BRACO, 20, 10);
+		
+		glPushMatrix();
+			glTranslatef(0, 0, COMPRIMENTO_BRACO);
+			glColor3f(0, 0, 1);
+			glScalef(1, 0.75, 0.75);
+			gluSphere(Robot->quadric, GROSSURA_BRACO/1.1*1.25, 20, 10);
+		glPopMatrix();
 	glPopMatrix();
 	
 	
@@ -178,14 +191,20 @@ void DesenhaRobot(robot *Robot) {
 		//coxa direita
 		glPushMatrix();
 			glTranslatef(1.5f, -5.0f, 0.0f);
-			glRotatef(90.0f, 1.0f, 0.05f, 0.0f);
+			glRotatef(90.0f, 1.0f, 0.02f, 0.0f);
 			gluSphere(Robot->quadric, 1, 20, 10);
 			gluCylinder(Robot->quadric, 1, 0.75, 3.5, 20, 10);
+		glPopMatrix();
+		//joelho direito
+		glPushMatrix();
+			glTranslatef(1.5, -8.5, 0);
+			glScalef(1, 0.75, 1);
+			gluSphere(Robot->quadric, 1, 20, 10);
 		glPopMatrix();
 		//canela direita
 		glPushMatrix();
 			glTranslatef(1.5f, -8.5f, 0.0f);
-			glRotatef(90.0f, 1.0f, -0.05f, 0.0f);
+			glRotatef(90.0f, 1.0f, -0.02f, 0.0f);
 			gluSphere(Robot->quadric, 0.75, 20, 10);
 			gluCylinder(Robot->quadric, 0.75, 0.75, 3.0, 20, 10);
 		glPopMatrix();
@@ -202,14 +221,20 @@ void DesenhaRobot(robot *Robot) {
 		//coxa esquerda
 		glPushMatrix();
 			glTranslatef(-1.5f, -5.0f, 0.0f);
-			glRotatef(90.0f, 1.0f, -0.05f, 0.0f);
+			glRotatef(90.0f, 1.0f, -0.02f, 0.0f);
 			gluSphere(Robot->quadric, 0.75, 20, 10);
 			gluCylinder(Robot->quadric, 1, 0.75, 3.5, 20, 10);
+		glPopMatrix();
+		//joelho esquerdo
+		glPushMatrix();
+			glTranslatef(-1.5, -8.5, 0);
+			glScalef(1, 0.75, 1);
+			gluSphere(Robot->quadric, 1, 20, 10);
 		glPopMatrix();
 		//canela esquerda
 		glPushMatrix();
 			glTranslatef(-1.5f, -8.5f, 0.0f);
-			glRotatef(90.0f, 1.0f, 0.05f, 0.0f);
+			glRotatef(90.0f, 1.0f, 0.02f, 0.0f);
 			gluSphere(Robot->quadric, 0.75, 20, 10);
 			gluCylinder(Robot->quadric, 0.75, 0.75, 3.0, 20, 10);
 		glPopMatrix();
@@ -259,35 +284,25 @@ void Inicializa1() {
 
 void move_pernas(robot *Robot) {
 	if (Robot->movendo_pernas) {
-		
-	}
-	switch(Robot->movendo_pernas) {
-		case 1:
-		case 2:
-			Robot->rot_perna_dir = 45;
-			Robot->rot_perna_esq = -30;
-			Robot->rot_braco_dir = -30;
-			Robot->rot_braco_esq = 30;
-			Robot->movendo_pernas++;
-			break;
-		case 3:
-		case 4:
-			Robot->rot_perna_dir = -30;
-			Robot->rot_perna_esq = 45;
-			Robot->rot_braco_dir = 45;
-			Robot->rot_braco_esq = -30;
-			Robot->movendo_pernas++;
-			break;
-		case 5:
+		if (Robot->movendo_pernas >= 1 && Robot->movendo_pernas <= 5) {
+			Robot->rot_perna_dir = Robot->movendo_pernas * 9;
+			Robot->rot_braco_esq = Robot->rot_perna_dir;
+			Robot->rot_perna_esq = Robot->movendo_pernas * -6;
+			Robot->rot_braco_dir = Robot->rot_perna_esq;
+		} else if (Robot->movendo_pernas >= 6 && Robot->movendo_pernas <= 10) {
+			Robot->rot_perna_dir = (Robot->movendo_pernas - 5) * -6;
+			Robot->rot_braco_esq = Robot->rot_perna_dir;
+			Robot->rot_perna_esq = (Robot->movendo_pernas - 5) * 9;
+			Robot->rot_braco_dir = Robot->rot_perna_esq;
+		} else if (Robot->movendo_pernas == 11) {
 			Robot->rot_perna_dir = 0;
 			Robot->rot_perna_esq = 0;
 			Robot->rot_braco_dir = 0;
 			Robot->rot_braco_esq = 0;
-			Robot->movendo_pernas++;
-			break;
-		default:
-			Robot->movendo_pernas = 0;
-			break;		
+		} else {
+			Robot->movendo_pernas = -1;
+		}
+		Robot->movendo_pernas++;
 	}
 	glutPostRedisplay();
 }
