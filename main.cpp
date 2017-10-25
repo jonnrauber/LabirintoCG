@@ -6,6 +6,7 @@
 #include "defs.h"
 #include "robot.h"
 #include "objeto1.h"
+#include "objeto2.h"
 
 GLfloat angulo = 90.0;
 GLfloat posX = TAM_BLOCO*1.5, posZ = TAM_BLOCO*1.5;
@@ -110,7 +111,7 @@ void Desenha() {
 	glPushMatrix();
 		glTranslatef(TAM_BLOCO*9.5, 0, TAM_BLOCO*1.5);
 		glRotatef(90, 0, 1, 0);
-		DesenhaObjeto1();
+		DesenhaObjeto2();
 	glPopMatrix();
 	
 	glPushMatrix();
