@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <stdlib.h>
+#include <time.h>
 #include "defs.h"
 #include "robot.h"
 #include "objeto1.h"
@@ -18,24 +19,24 @@ enum camera {PANORAMICA = 1, ATRAS_ROBO = 2} cam;
 enum modo_jogo {MANUAL 	= 1, AUTOMATICO = 2} modo;
 
 GLfloat luz_chao[] = { 0.1, 1.0, 0.0, 1.0 };
-GLfloat luz_parede[] = { 0.9, 0.8, 0.7, 1.0 };
+GLfloat luz_parede[] = { 0.9, 0.9, 0.8, 1.0 };
 GLfloat luz_robot[] = { 0.9, 0.8, 0.7, 1.0 };
 
 GLfloat mapa[TAM_MAPA][TAM_MAPA] = {
 		{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}, 
 		{1,0,1,0,1,0,1,0,0,0,1,0,0,0,1}, 
 		{1,0,1,0,0,0,1,1,1,0,1,1,1,0,1},
-		{1,0,1,0,1,0,1,0,1,0,0,0,0,0,1},
-		{1,0,0,0,1,0,1,0,0,0,1,0,1,1,1},
-		{1,0,1,0,1,0,1,1,1,0,1,0,1,0,0},
-		{1,0,1,0,1,0,1,0,1,0,1,0,0,0,1},
-		{1,0,1,0,1,0,1,0,0,0,1,1,1,1,1},
-		{1,0,1,0,1,0,1,0,1,1,1,0,0,0,1},
-		{1,0,1,0,1,0,1,0,0,0,0,0,1,1,1},
-		{1,0,1,0,1,0,1,0,1,1,1,0,0,0,1},
-		{1,0,1,0,1,0,1,1,1,0,0,0,1,0,1},
-		{1,0,1,0,1,0,0,0,1,1,0,1,1,0,1},
-		{1,0,1,0,1,0,1,0,0,0,0,0,0,0,1},
+		{1,0,0,0,1,0,1,0,1,0,0,0,0,0,1},
+		{1,1,1,0,1,0,1,0,0,0,1,0,1,1,1},
+		{1,0,0,0,1,0,1,1,1,0,1,0,1,0,0},
+		{1,0,1,1,1,0,0,0,1,0,1,0,0,0,1},
+		{1,0,1,0,1,1,1,0,0,0,1,1,1,1,1},
+		{1,0,0,0,1,0,0,0,1,1,1,0,0,0,1},
+		{1,0,0,0,1,0,1,0,0,0,0,0,1,1,1},
+		{1,1,1,0,1,0,1,0,1,1,1,0,0,0,1},
+		{1,0,0,0,1,0,1,1,1,0,0,0,1,0,1},
+		{1,0,1,1,1,0,0,0,1,1,0,1,1,0,1},
+		{1,0,0,0,0,0,1,0,0,0,0,0,0,0,1},
 		{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
 	};
 
@@ -102,12 +103,19 @@ void Desenha() {
 	glPushMatrix();
 		glTranslatef(posX, 0, posZ);
 		glRotatef(180+angulo, 0, 1, 0);
-		//glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, luz_parede);
+		glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, luz_parede);
 		DesenhaRobot(Robot);
 	glPopMatrix();
 	
 	glPushMatrix();
 		glTranslatef(TAM_BLOCO*9.5, 0, TAM_BLOCO*1.5);
+		glRotatef(90, 0, 1, 0);
+		DesenhaObjeto1();
+	glPopMatrix();
+	
+	glPushMatrix();
+		glTranslatef(TAM_BLOCO*8.5, 0, TAM_BLOCO*12.5);
+		glRotatef(90, 0, 1, 0);
 		DesenhaObjeto1();
 	glPopMatrix();
 	
@@ -201,9 +209,7 @@ void AlteraTamanhoJanela(GLsizei w, GLsizei h) {
     // Especifica as dimensões da Viewport
     if (h == 0) h=1;
     
-    glViewport(0, 0, w, h);
-    //W = w;
-    //H = h;                   
+    glViewport(0, 0, w, h);       
 
     // Inicializa o sistema de coordenadas
     glMatrixMode(GL_PROJECTION);
@@ -222,7 +228,7 @@ void GerenciaTecladoEspecial(int key, int x, int y) {
 		if (!Robot->movendo_pernas)
 			Robot->movendo_pernas = 1;
 	}
-	else if(key == GLUT_KEY_DOWN && modo == MANUAL) {
+	if(key == GLUT_KEY_DOWN && modo == MANUAL) {
 		int bloco_mapa_x = (int) ((posX - 7*sin(angulo/rad)) / TAM_BLOCO);
 		int bloco_mapa_z = (int) ((posZ - 7*cos(angulo/rad)) / TAM_BLOCO);
 		if (mapa[bloco_mapa_x][bloco_mapa_z] != 1) {
@@ -232,16 +238,16 @@ void GerenciaTecladoEspecial(int key, int x, int y) {
 		if (!Robot->movendo_pernas)
 			Robot->movendo_pernas = 1;
 	} 
-	else if (key == GLUT_KEY_RIGHT) {
+	if (key == GLUT_KEY_RIGHT) {
 		angulo -= 5;
 		if (Robot->rot_cabeca >= -30)
 			Robot->rot_cabeca -= 3;
 	} 
-	else if (key == GLUT_KEY_LEFT) {
+	if (key == GLUT_KEY_LEFT) {
 		angulo += 5;
 		if (Robot->rot_cabeca <= 30)
 			Robot->rot_cabeca += 3;
-	} else return;
+	}
 	
 	glutPostRedisplay();
 	
@@ -332,14 +338,15 @@ void Timer(int a) {
  * Função Main
  * */
 int main(int argc, char *argv[]) {
+	srand(time(NULL));
 	Robot = inicializaRobot();
 	//inicialização dos módulos Glut
 	glutInit(&argc, argv);
 	
 	//inicializa os modos de Buffer Duplo, cores RGB e profundidade
-    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);  
+  glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);  
     
-    //configuração e inicialização da janela
+  //configuração e inicialização da janela
 	glutInitWindowSize(800, 600);
 	glutInitWindowPosition(10,10);
 	glutCreateWindow("Labirinto");
