@@ -75,23 +75,19 @@ void DesenhaRobot(robot *Robot) {
 		glTranslatef(0, 8.5, 0);
 		glRotatef(Robot->rot_cabeca, 0, 1, 0);
 		glutSolidCube(TAM_CABECA);
-		glColor3f(1, 0, 0);
-		
-		glPushMatrix();
-			//glTranslatef(TAM_CABECA/2.0, 0, 0);
-			//gluCylinder(Robot->quadric, COMPRIMENTO_ORELHAS/2.0, 0, COMPRIMENTO_ORELHAS, 20, 10);
-		glPopMatrix();
 		
 		glPushMatrix();
 			glTranslatef(0, 0, -TAM_CABECA/2.0);
 			//olho esquerdo
 			glPushMatrix();
+				glColor3f(1, 0, 0);
 				glTranslatef(-TAM_CABECA/6.0, TAM_CABECA/8.0, 0);
 				glutSolidSphere(RAIO_OLHOS, 30, 10);
 			glPopMatrix();
 			
 			//olho direito
 			glPushMatrix();
+				glColor3f(1, 0, 0);
 				glTranslatef(TAM_CABECA/6.0, TAM_CABECA/8.0, 0);
 				glutSolidSphere(RAIO_OLHOS, 30, 10);
 			glPopMatrix();

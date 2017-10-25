@@ -53,8 +53,8 @@ void DesenhaParedes() {
 				z_mun = z * TAM_BLOCO;
 				
 				glPushMatrix();
-					//glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, luz_parede);
-					glColor3f(1.0f, 1.0f, 1.0f);
+					glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, luz_parede);
+					glColor3f(75/255.0, 54/255.0, 1/255.0);
 					glTranslatef(x_mun + TAM_BLOCO/2.0, TAM_BLOCO/2.0, z_mun + TAM_BLOCO/2.0);
 					glutSolidCube(TAM_BLOCO);
 				glPopMatrix();
@@ -297,7 +297,7 @@ void move (void) {
 		if (!Robot->movendo_pernas)
 			Robot->movendo_pernas = 1;
 	} else {
-		angulo = (rand() % 4) * 90;
+		angulo += (rand() % 4) * 90;
 	}
 }
 
