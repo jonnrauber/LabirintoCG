@@ -9,9 +9,10 @@
 GLfloat angulo = 90.0;
 GLfloat posX = TAM_BLOCO*1.5, posZ = TAM_BLOCO*1.5;
 GLfloat zoomAereo = MAX/2.5;
-GLfloat zoomRobot = 16; 
+GLfloat zoomRobot = 26; 
 
 GLfloat rad = 57.2958;
+int aumenta = 1;
 
 enum camera {PANORAMICA = 1, ATRAS_ROBO = 2} cam;
 enum modo_jogo {MANUAL 	= 1, AUTOMATICO = 2} modo;
@@ -30,7 +31,7 @@ GLfloat mapa[TAM_MAPA][TAM_MAPA] = {
 		{1,0,1,0,1,0,1,0,1,0,1,0,0,0,1},
 		{1,0,1,0,1,0,1,0,0,0,1,1,1,1,1},
 		{1,0,1,0,1,0,1,0,1,1,1,0,0,0,1},
-		{1,0,1,0,1,0,1,0,1,0,0,0,1,1,1},
+		{1,0,1,0,1,0,1,0,0,0,0,0,1,1,1},
 		{1,0,1,0,1,0,1,0,1,1,1,0,0,0,1},
 		{1,0,1,0,1,0,1,1,1,0,0,0,1,0,1},
 		{1,0,1,0,1,0,0,0,1,1,0,1,1,0,1},
@@ -52,7 +53,7 @@ void DesenhaParedes() {
 				z_mun = z * TAM_BLOCO;
 				
 				glPushMatrix();
-					glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, luz_parede);
+					//glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, luz_parede);
 					glColor3f(1.0f, 1.0f, 1.0f);
 					glTranslatef(x_mun + TAM_BLOCO/2.0, TAM_BLOCO/2.0, z_mun + TAM_BLOCO/2.0);
 					glutSolidCube(TAM_BLOCO);
@@ -65,7 +66,7 @@ void DesenhaParedes() {
 void DesenhaMapa() {
 	glColor3f(0.5f, 1.0f, 0.5f);
 	
-	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, luz_chao);
+	//glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, luz_chao);
 	glBegin(GL_QUADS);
 		glVertex3f(-TAM_MUNDO*TAM_BLOCO, 0, -TAM_MUNDO*TAM_BLOCO);
 		glVertex3f(-TAM_MUNDO*TAM_BLOCO, 0, TAM_MUNDO*TAM_BLOCO);
@@ -101,7 +102,7 @@ void Desenha() {
 	glPushMatrix();
 		glTranslatef(posX, 0, posZ);
 		glRotatef(180+angulo, 0, 1, 0);
-		glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, luz_parede);
+		//glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, luz_parede);
 		DesenhaRobot(Robot);
 	glPopMatrix();
 	
@@ -172,15 +173,10 @@ void GerenciaMouse(int button, int state, int x, int y) {
 void InicializaIluminacao() {
 	glClearColor (0.0, 0.5, 1.0, 1.0);
 	glShadeModel (GL_SMOOTH);
-
-	GLfloat mat_specular[] = { 0.7, 0.7, 0.7, 1.0 };
-	GLfloat mat_shininess[] = { 5.0 };
+	
 	GLfloat light_position[] = { 50.0, 50.0, 50.0, 30.0 };
 	GLfloat light_direction[] = { 0.0, -1.0, 0.0 };
 	GLfloat light_ambient[] = { 0.0, 0.0, 0.0, 1.0 };
-	
-	glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
-	glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
 	
 	glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
 	glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION, light_direction);
@@ -216,7 +212,7 @@ void AlteraTamanhoJanela(GLsizei w, GLsizei h) {
 }
 
 void GerenciaTecladoEspecial(int key, int x, int y) {
-	if(key == GLUT_KEY_UP) {
+	if(key == GLUT_KEY_UP && modo == MANUAL) {
 		int bloco_mapa_x = (int) ((posX + 7*sin(angulo/rad)) / TAM_BLOCO);
 		int bloco_mapa_z = (int) ((posZ + 7*cos(angulo/rad)) / TAM_BLOCO);
 		if (mapa[bloco_mapa_x][bloco_mapa_z] != 1) {
@@ -226,7 +222,7 @@ void GerenciaTecladoEspecial(int key, int x, int y) {
 		if (!Robot->movendo_pernas)
 			Robot->movendo_pernas = 1;
 	}
-	else if(key == GLUT_KEY_DOWN) {
+	else if(key == GLUT_KEY_DOWN && modo == MANUAL) {
 		int bloco_mapa_x = (int) ((posX - 7*sin(angulo/rad)) / TAM_BLOCO);
 		int bloco_mapa_z = (int) ((posZ - 7*cos(angulo/rad)) / TAM_BLOCO);
 		if (mapa[bloco_mapa_x][bloco_mapa_z] != 1) {
@@ -238,9 +234,13 @@ void GerenciaTecladoEspecial(int key, int x, int y) {
 	} 
 	else if (key == GLUT_KEY_RIGHT) {
 		angulo -= 5;
+		if (Robot->rot_cabeca >= -30)
+			Robot->rot_cabeca -= 3;
 	} 
 	else if (key == GLUT_KEY_LEFT) {
 		angulo += 5;
+		if (Robot->rot_cabeca <= 30)
+			Robot->rot_cabeca += 3;
 	} else return;
 	
 	glutPostRedisplay();
@@ -301,6 +301,16 @@ void move (void) {
 	}
 }
 
+void move_cabeca() {
+	if (Robot->rot_cabeca <= -30) {
+		aumenta = 1;
+	} else if (Robot->rot_cabeca >= 30) {
+		aumenta = 0;
+	}
+	if (aumenta) Robot->rot_cabeca += 3;
+	else Robot->rot_cabeca -= 3;
+}
+
 /**
  * Função de Timer
  * Se o modo selecionado for "AUTOMATICO", o robô tentará encontrar o caminho para o fim do labirinto sozinho.
@@ -309,8 +319,10 @@ void move (void) {
 void Timer(int a) {
 	if (modo == AUTOMATICO)
 		move();
-	if (Robot->movendo_pernas)
+	if (Robot->movendo_pernas) {
+		move_cabeca();
 		move_pernas(Robot);
+	}
 		
 	glutPostRedisplay();
 	glutTimerFunc(1000.0/FPS, Timer, 1);

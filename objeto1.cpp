@@ -2,6 +2,8 @@
 #include "objeto1.h"
 
 void DesenhaObjeto1() {
+	glScalef(3, 4, 3);
+	glTranslatef(-4,2,0);
 	glPushMatrix();
 		glTranslatef(-4,0,0);
 	    glScalef(1,1,2);
@@ -99,5 +101,6 @@ void DesenhaObjeto1() {
         glScalef(2.0,2.0,0);
         gluSphere(esfera8, 0.5f, 4, 4);
 	glPopMatrix();
+	
 }
 

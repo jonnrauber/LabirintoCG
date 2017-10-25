@@ -8,6 +8,7 @@ typedef struct robot {
 	GLfloat rot_perna_esq;
 	GLfloat rot_braco_dir;
 	GLfloat rot_braco_esq;
+	GLfloat rot_cabeca;
 	int movendo_pernas;	
 	GLUquadricObj* quadric;
 } robot;

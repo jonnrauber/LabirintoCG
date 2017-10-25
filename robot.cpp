@@ -1,31 +1,6 @@
 #include "defs.h"
 #include "robot.h"
 
-GLfloat shininess[] = { 1.0 };
-
-void DesenhaCorpo() {
-	GLfloat v[8][3] = {
-			{-LARGURA_CORPO/2.0, -ALTURA_CORPO/2.0, LARGURA_CORPO/3.5},
-			{LARGURA_CORPO/2.0, -ALTURA_CORPO/2.0, LARGURA_CORPO/3.5},
-			{LARGURA_CORPO/2.0, ALTURA_CORPO/2.0, LARGURA_CORPO/3.5},
-			{-LARGURA_CORPO/2.0, ALTURA_CORPO/2.0, LARGURA_CORPO/3.5},
-			{-LARGURA_CORPO/2.0, -ALTURA_CORPO/2.0, -LARGURA_CORPO/3.5},
-			{LARGURA_CORPO/2.0, -ALTURA_CORPO/2.0, -LARGURA_CORPO/3.5},
-			{LARGURA_CORPO/2.0, ALTURA_CORPO/2.0, -LARGURA_CORPO/3.5},
-			{-LARGURA_CORPO/2.0, ALTURA_CORPO/2.0, -LARGURA_CORPO/3.5}
-		};	
-	
-	
-	glBegin(GL_QUADS);
-		glVertex3fv(v[0]); glVertex3fv(v[1]); glVertex3fv(v[2]); glVertex3fv(v[3]);
-		glVertex3fv(v[4]); glVertex3fv(v[5]); glVertex3fv(v[6]); glVertex3fv(v[7]);
-		glVertex3fv(v[1]); glVertex3fv(v[5]); glVertex3fv(v[6]); glVertex3fv(v[2]);
-		glVertex3fv(v[0]); glVertex3fv(v[4]); glVertex3fv(v[7]); glVertex3fv(v[3]);
-		glVertex3fv(v[2]); glVertex3fv(v[6]); glVertex3fv(v[7]); glVertex3fv(v[3]);
-		glVertex3fv(v[0]); glVertex3fv(v[1]); glVertex3fv(v[5]); glVertex3fv(v[4]);
-	glEnd();
-}
-
 void DesenhaPe() {
 	glColor3f(0, 0, 1);
 	GLfloat v[8][3] = {
@@ -61,13 +36,17 @@ void DesenhaRobot(robot *Robot) {
 	//desenha o corpo
 	glPushMatrix();
 		glColor3f(0.9f, 0.9f, 0.9f); //cor cinza
-		DesenhaCorpo();
+		glPushMatrix();
+			glScalef(LARGURA_CORPO, ALTURA_CORPO, LARGURA_CORPO/1.75);
+			glutSolidCube(1);
+		glPopMatrix();
 		
 		//antenas ombros
 		glPushMatrix();
 			glTranslatef(LARGURA_CORPO/2.5, ALTURA_CORPO/2.0, 0);
 			glRotatef(-30, 0, 0, 1);
 			glRotatef(-90, 1, 0, 0);
+			glColor3f(0.9f, 0.9f, 0.9f); //cor cinza
 			gluCylinder(Robot->quadric, 0.1, 0.1, ALTURA_CORPO/2.0, 20, 10);
 			glutSolidSphere(RAIO_ANTENA, 30, 10);
 		glPopMatrix();
@@ -94,6 +73,7 @@ void DesenhaRobot(robot *Robot) {
 	glPushMatrix();
 		glColor3f(0.5, 0.5, 0.5);
 		glTranslatef(0, 8.5, 0);
+		glRotatef(Robot->rot_cabeca, 0, 1, 0);
 		glutSolidCube(TAM_CABECA);
 		glColor3f(1, 0, 0);
 		
@@ -118,6 +98,7 @@ void DesenhaRobot(robot *Robot) {
 			
 			//sorriso
 			glPushMatrix();
+				glColor3f(1, 1, 1);
 				glTranslatef(0, -TAM_CABECA/4.0, 0);
 				glScalef(LARGURA_SORRISO, ALTURA_SORRISO, 0.25);
 				glutSolidCube(1);
@@ -252,6 +233,7 @@ robot* inicializaRobot() {
 	Robot->rot_perna_esq = 0;
 	Robot->rot_braco_dir = 0;
 	Robot->rot_braco_esq = 0;
+	Robot->rot_cabeca = 0;
 	Robot->movendo_pernas = 0;
 	Robot->quadric = gluNewQuadric();
 	
