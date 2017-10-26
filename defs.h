@@ -1,3 +1,7 @@
+/**
+ * @author JEFFERSON A. COPPINI, JONATHAN T. RAUBER
+ * */
+
 //objeto1
 #define LARGURA_MESA TAM_BLOCO
 #define ALTURA_MESA LARGURA_MESA/2.0
@@ -22,7 +26,7 @@
 
 
 //mundo do jogo
-#define MAX 400.0
+#define MAX 160.0
 #define FPS 30
 #define TAM_BLOCO 20
 #define TAM_MAPA 15

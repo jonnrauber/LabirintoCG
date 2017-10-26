@@ -1,8 +1,12 @@
+/**
+ * @author JEFFERSON A. COPPINI, JONATHAN T. RAUBER
+ * */
+
 #include "defs.h"
 #include "objeto1.h"
 
 void DesenhaObjeto1() {
-	glScalef(3, 4, 3);
+	glScalef(3, 3.5, 3);
 	glTranslatef(-4,2,0);
 	glPushMatrix();
 		glTranslatef(-4,0,0);

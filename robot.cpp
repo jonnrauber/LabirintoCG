@@ -1,3 +1,7 @@
+/**
+ * @author JEFFERSON A. COPPINI, JONATHAN T. RAUBER
+ * */
+
 #include "defs.h"
 #include "robot.h"
 
@@ -16,15 +20,10 @@ void DesenhaPe() {
 		
 	glBegin(GL_QUADS);
 		glVertex3fv(v[0]); glVertex3fv(v[1]); glVertex3fv(v[2]); glVertex3fv(v[3]);
-		
 		glVertex3fv(v[4]); glVertex3fv(v[5]); glVertex3fv(v[6]); glVertex3fv(v[7]);
-		
 		glVertex3fv(v[1]); glVertex3fv(v[5]); glVertex3fv(v[6]); glVertex3fv(v[2]);
-				
 		glVertex3fv(v[0]); glVertex3fv(v[4]); glVertex3fv(v[7]); glVertex3fv(v[3]);
-		
 		glVertex3fv(v[2]); glVertex3fv(v[6]); glVertex3fv(v[7]); glVertex3fv(v[3]);
-		
 		glVertex3fv(v[0]); glVertex3fv(v[1]); glVertex3fv(v[5]); glVertex3fv(v[4]);
 	glEnd();
 }

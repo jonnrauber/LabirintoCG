@@ -1,3 +1,7 @@
+/**
+ * @author JEFFERSON A. COPPINI, JONATHAN T. RAUBER
+ * */
+ 
 #include "defs.h"
 #include "objeto2.h"
 
@@ -56,6 +60,17 @@ void DesenhaObjeto2() {
 		GLUquadricObj *botao3 = gluNewQuadric();
 	    glTranslatef(0,4,4);
         gluSphere(botao3, 0.3, 30, 30);
+	glPopMatrix();
+	
+	glColor3f(0.0f, 0.5f, 0.0f);
+	glPushMatrix();
+		glTranslatef(0.75,8.5,2);
+		gluSphere(botao3, 0.3, 30, 30);
+	glPopMatrix();
+	
+	glPushMatrix();
+		glTranslatef(-0.75,8.5,2);
+		gluSphere(botao3, 0.3, 30, 30);
 	glPopMatrix();
 	
 	glColor3f(1.0f, 0.5f, 0.0f);

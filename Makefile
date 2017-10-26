@@ -14,7 +14,7 @@ robot.o: robot.cpp
 objeto1.o: objeto1.cpp
 	g++ -c objeto1.cpp -Wall -lGL -lGLU -lglut
 	
-objeto1.o: objeto2.cpp
+objeto2.o: objeto2.cpp
 	g++ -c objeto2.cpp -Wall -lGL -lGLU -lglut          
 
 order: 

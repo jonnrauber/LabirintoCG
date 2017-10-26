@@ -1,3 +1,7 @@
+/**
+ * @author JEFFERSON A. COPPINI, JONATHAN T. RAUBER
+ * */
+
 #ifndef OBJETO1
 #define OBJETO1 
 
