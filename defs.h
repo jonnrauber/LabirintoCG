@@ -9,6 +9,14 @@
 #include <time.h>
 #include <string.h>
 
+
+//mundo do jogo
+#define FPS 30 ///alterar aqui para mudar a taxa de atualização em ms
+#define MAX 160.0
+#define TAM_BLOCO 20
+#define TAM_MAPA 15
+#define TAM_MUNDO 1000
+
 //objeto1
 #define LARGURA_MESA TAM_BLOCO
 #define ALTURA_MESA LARGURA_MESA/2.0
@@ -30,15 +38,6 @@
 #define RAIO_ANTENA RAIO_OLHOS/2.0
 #define COMPRIMENTO_BRACO ALTURA_CORPO/2.5
 #define GROSSURA_BRACO ALTURA_CORPO/15.0
-
-
-//mundo do jogo
-#define MAX 160.0
-#define FPS 30
-#define TAM_BLOCO 20
-#define TAM_MAPA 15
-#define TAM_MUNDO 1000
-
 
 /* Cabeçalhos das funções */
 void ReiniciaLabirinto(void);
