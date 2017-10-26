@@ -25,6 +25,7 @@ GLfloat rad = 57.2958;
 int aumenta = 1;
 bool menu_inicial = true;
 bool menu_help = false;
+bool menu_venceu = false;
 
 enum camera {PANORAMICA = 1, ATRAS_ROBO = 2} cam;
 enum modo_jogo {MANUAL 	= 1, AUTOMATICO = 2} modo;
@@ -33,6 +34,8 @@ GLfloat luz_chao[] = { 0.1, 1.0, 0.0, 1.0 };
 GLfloat luz_parede[] = { 0.9, 0.9, 0.8, 1.0 };
 GLfloat luz_robot[] = { 0.9, 0.8, 0.7, 1.0 };
 
+
+int bloco_final_x = 5, bloco_final_z = 14;
 /// matriz de ocorrência de blocos no labirinto (paredes)
 GLfloat mapa[TAM_MAPA][TAM_MAPA] = {
 		{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}, 
@@ -189,7 +192,7 @@ void Desenha() {
 		glMatrixMode(GL_MODELVIEW);
 	}
 	
-	if (menu_help) {
+	if (menu_help && !menu_venceu) {
 		glMatrixMode(GL_PROJECTION);
 		glPushMatrix();
 			glLoadIdentity();
@@ -220,6 +223,44 @@ void Desenha() {
 			DesenhaTexto(SCREEN_WIDTH/5.0, SCREEN_HEIGHT/1.9, 1.0f, 1.0f, 1.0f, texto5, 0);
 			char texto6[] = "tecle H para sair";
 			DesenhaTexto(SCREEN_WIDTH/2.5, SCREEN_HEIGHT/1.7, 1.0f, 1.0f, 1.0f, texto6, 0);
+			
+			glEnable(GL_DEPTH_TEST);
+			glEnable(GL_LIGHTING);
+			
+			glMatrixMode(GL_PROJECTION);
+		glPopMatrix();
+		glMatrixMode(GL_MODELVIEW);
+	}
+	
+	if (menu_venceu) {
+		glMatrixMode(GL_PROJECTION);
+		glPushMatrix();
+			glLoadIdentity();
+			glOrtho(0.0, SCREEN_WIDTH, SCREEN_HEIGHT, 0.0, -1.0, 10.0);
+			glMatrixMode(GL_MODELVIEW);
+			glLoadIdentity();
+			
+			glDisable(GL_LIGHTING); //desabilita a luz e coloca o texto
+			glDisable(GL_DEPTH_TEST);
+			
+			glColor3f(0, 0, 0);
+			glBegin(GL_QUADS);
+				glVertex2f(SCREEN_WIDTH/6.0, SCREEN_HEIGHT/4.0);
+				glVertex2f(SCREEN_WIDTH/6.0, SCREEN_HEIGHT - SCREEN_HEIGHT/2.5);
+				glVertex2f(SCREEN_WIDTH - SCREEN_WIDTH/6.0, SCREEN_HEIGHT - SCREEN_HEIGHT/2.5);
+				glVertex2f(SCREEN_WIDTH - SCREEN_WIDTH/6.0, SCREEN_HEIGHT/4.0);
+			glEnd();			
+			
+			if (modo == AUTOMATICO) {
+				char texto_venceu[] = "FIM DO LABIRINTO, O ROBO VENCEU!!!";
+				DesenhaTexto(SCREEN_WIDTH/3.2, SCREEN_HEIGHT/2.5, 1.0f, 1.0f, 1.0f, texto_venceu, 1);
+			} else {
+				char texto_venceu[] = "FIM DO LABIRINTO, VOCE VENCEU!!!";
+				DesenhaTexto(SCREEN_WIDTH/3.2, SCREEN_HEIGHT/2.5, 1.0f, 1.0f, 1.0f, texto_venceu, 1);
+			}
+			
+			char texto_reinicia[] = "tecle ENTER para reiniciar o labirinto";
+			DesenhaTexto(SCREEN_WIDTH/3.2, SCREEN_HEIGHT/2.0, 1.0f, 1.0f, 1.0f, texto_reinicia, 0);
 			
 			glEnable(GL_DEPTH_TEST);
 			glEnable(GL_LIGHTING);
@@ -343,7 +384,7 @@ void AlteraTamanhoJanela(GLsizei w, GLsizei h) {
 
 /** Retorna true se o movimento do robô não o fará colidir com um bloco
  * ou um objeto, e retorna false caso colida. */
-bool verifica_colisao_objetos (int bloco_mapa_x, int bloco_mapa_z) {
+bool verifica_colisao_objetos (int bloco_mapa_x, int bloco_mapa_z) {	
 	int bloco_objeto1_x = (int) (posObj1X / TAM_BLOCO);
 	int bloco_objeto1_z = (int) (posObj1Z / TAM_BLOCO);
 	int bloco_objeto2_x = (int) (posObj2X / TAM_BLOCO);
@@ -358,16 +399,27 @@ bool verifica_colisao_objetos (int bloco_mapa_x, int bloco_mapa_z) {
 	return true;
 }
 
+/** verifica se o robô chegou ao bloco final do labirinto */
+bool verifica_venceu (int bloco_mapa_x, int bloco_mapa_z) {
+	if (bloco_mapa_x == bloco_final_x && bloco_mapa_z == bloco_final_z) {
+		return true;
+	}
+	return false;
+}
+
 /** 
  * Função CallBack que monitora as interrupções de teclas especiais 
 **/
 void GerenciaTecladoEspecial(int key, int x, int y) {
-	if(!menu_inicial) {
-		/* Se já passou do menu inicial */
+	if(!menu_inicial && !menu_venceu) {
 		if(key == GLUT_KEY_UP && modo == MANUAL) {
 			//anda para frente no modo manual
 			int bloco_mapa_x = (int) ((posX + 7*sin(angulo/rad)) / TAM_BLOCO);
 			int bloco_mapa_z = (int) ((posZ + 7*cos(angulo/rad)) / TAM_BLOCO);
+			
+			if (verifica_venceu(bloco_mapa_x, bloco_mapa_z))
+				menu_venceu = true;
+			
 			if (mapa[bloco_mapa_x][bloco_mapa_z] != 1 && verifica_colisao_objetos(bloco_mapa_x, bloco_mapa_z)) {
 				posX += sin(angulo/rad);
 				posZ += cos(angulo/rad);
@@ -375,10 +427,14 @@ void GerenciaTecladoEspecial(int key, int x, int y) {
 			if (!Robot->movendo_pernas)
 				Robot->movendo_pernas = 1;
 		}
-		if(key == GLUT_KEY_DOWN && modo == MANUAL) {
+		else if(key == GLUT_KEY_DOWN && modo == MANUAL) {
 			//anda para trás no modo manual
 			int bloco_mapa_x = (int) ((posX - 7*sin(angulo/rad)) / TAM_BLOCO);
 			int bloco_mapa_z = (int) ((posZ - 7*cos(angulo/rad)) / TAM_BLOCO);
+			
+			if (verifica_venceu(bloco_mapa_x, bloco_mapa_z))
+				menu_venceu = true;
+			
 			if (mapa[bloco_mapa_x][bloco_mapa_z] != 1 && verifica_colisao_objetos(bloco_mapa_x, bloco_mapa_z)) {
 				posX -= sin(angulo/rad);
 				posZ -= cos(angulo/rad);
@@ -386,13 +442,13 @@ void GerenciaTecladoEspecial(int key, int x, int y) {
 			if (!Robot->movendo_pernas)
 				Robot->movendo_pernas = 1;
 		} 
-		if (key == GLUT_KEY_RIGHT) {
+		else if (key == GLUT_KEY_RIGHT) {
 			//muda a direção para 5 graus à direita
 			angulo -= 5;
 			if (Robot->rot_cabeca >= -30)
 				Robot->rot_cabeca -= 3;
 		} 
-		if (key == GLUT_KEY_LEFT) {
+		else if (key == GLUT_KEY_LEFT) {
 			//muda a direção para 5 graus à esquerda
 			angulo += 5;
 			if (Robot->rot_cabeca <= 30)
@@ -410,7 +466,7 @@ void GerenciaTecladoEspecial(int key, int x, int y) {
  * Executa ações referentes ao zoom da câmera e troca de perspectiva.
  * */
 void GerenciaTeclado(unsigned char key, int x, int y) {
-	if (!menu_inicial) {
+	if (!menu_inicial && !menu_venceu) {
 		if (cam == PANORAMICA) {
 			//Controla a proximidade da câmera aérea
 			if (key == '+') {
@@ -447,14 +503,20 @@ void GerenciaTeclado(unsigned char key, int x, int y) {
 				modo = MANUAL;
 			}
 		}
-	} else {
+	} else if (!menu_inicial && menu_venceu) {
+		if (key == 13) {
+			// Se estiver no menu inicial e for pressionada a tecla ENTER, libera o labirinto
+			menu_venceu = false;
+			reiniciaLabirinto();
+		}
+	} else if (menu_inicial && !menu_venceu) {
 		if (key == 13) {
 			// Se estiver no menu inicial e for pressionada a tecla ENTER, libera o labirinto
 			menu_inicial = false;
 		}
 	}
 	
-	if (key == 'h' || key == 'H') {
+	if ((key == 'h' || key == 'H') && !menu_venceu) {
 		menu_help = !menu_help;
 	}
 	
@@ -468,6 +530,11 @@ void move (void) {
 	//Calcula para qual bloco o robô vai após o movimento para frente
 	int bloco_mapa_x = (int) ((posX + 7*sin(angulo/rad)) / TAM_BLOCO);
 	int bloco_mapa_z = (int) ((posZ + 7*cos(angulo/rad)) / TAM_BLOCO);
+	
+	printf("posX %f posZ %f blocoX %d blocoZ %d alvoX %d alvoZ %d\n", posX, posZ, bloco_mapa_x, bloco_mapa_z, bloco_final_x, bloco_final_z);
+	
+	if (verifica_venceu(bloco_mapa_x, bloco_mapa_z))
+		menu_venceu = true;
 	
 	if (mapa[bloco_mapa_x][bloco_mapa_z] != 1 && verifica_colisao_objetos(bloco_mapa_x, bloco_mapa_z)) {
 		/* Se não colidir com algum bloco de parede ou com algum objeto,
@@ -497,6 +564,11 @@ void move_cabeca (void) {
 	else Robot->rot_cabeca -= 3;
 }
 
+
+void ReiniciaLabirinto(void) {
+	
+} 
+
 /**
  * Função de Timer
  * ATENÇÃO: para trocar a taxa de milissegundos ou FPS, alterar a constante FPS no arquivo defs.h
@@ -505,7 +577,7 @@ void move_cabeca (void) {
  * Caso contrário (modo "MANUAL") somente espera uma ação do usuário.
  * */
 void Timer(int a) {
-	if (!menu_inicial) {
+	if (!menu_inicial && !menu_venceu) {
 		if (modo == AUTOMATICO)
 			move();
 		if (Robot->movendo_pernas) {
