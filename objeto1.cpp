@@ -1,9 +1,9 @@
 /**
  * @author JEFFERSON A. COPPINI, JONATHAN T. RAUBER
+ * Implementação da função de desenho do objeto carro, chamado no arquivo main.cpp
  * */
 
 #include "defs.h"
-#include "objeto1.h"
 
 void DesenhaObjeto1() {
 	glScalef(3, 3.5, 3);

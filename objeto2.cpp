@@ -1,9 +1,9 @@
 /**
  * @author JEFFERSON A. COPPINI, JONATHAN T. RAUBER
+ * Implementação da função de desenho do objeto boneco de neve, chamado no arquivo main.cpp
  * */
  
 #include "defs.h"
-#include "objeto2.h"
 
 void DesenhaObjeto2() {
 	glTranslatef(0,7,0);

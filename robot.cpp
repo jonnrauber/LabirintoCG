@@ -253,12 +253,9 @@ void DesenhaRobot2() {
 	glutSwapBuffers();
 }
 
-void Inicializa1() {
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LESS);
-}
-
+/**
+ * Função que executa o movimento das pernas e dos bracos do robô 
+ * */
 void move_pernas(robot *Robot) {
 	if (Robot->movendo_pernas) {
 		if (Robot->movendo_pernas >= 1 && Robot->movendo_pernas <= 5) {

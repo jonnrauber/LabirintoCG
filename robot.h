@@ -5,8 +5,6 @@
 #ifndef ROBOT
 #define ROBOT
 
-#include <GL/glut.h>
-
 typedef struct robot {
 	GLfloat rot_perna_dir;
 	GLfloat rot_perna_esq;

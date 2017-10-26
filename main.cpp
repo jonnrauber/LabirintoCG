@@ -2,23 +2,15 @@
  * @author JEFFERSON A. COPPINI, JONATHAN T. RAUBER
  * */
 
-#include <GL/glut.h>
-#include <stdio.h>
-#include <math.h>
-#include <stdlib.h>
-#include <time.h>
-#include <string.h>
 #include "defs.h"
 #include "robot.h"
-#include "objeto1.h"
-#include "objeto2.h"
 
 GLfloat angulo = 90.0;
 GLfloat posX = TAM_BLOCO*1.5, posZ = TAM_BLOCO*1.5;
 GLfloat posObj1X = TAM_BLOCO*9.5, posObj1Z = TAM_BLOCO*1.5;
 GLfloat posObj2X = TAM_BLOCO*8.5, posObj2Z = TAM_BLOCO*13.5;
 GLfloat zoomAereo = MAX;
-GLfloat zoomRobot = 26; 
+GLfloat zoomRobot = 26;
 GLfloat SCREEN_WIDTH = 800.0;
 GLfloat SCREEN_HEIGHT = 700.0;
 GLfloat rad = 57.2958;
@@ -38,7 +30,7 @@ GLfloat luz_robot[] = { 0.9, 0.8, 0.7, 1.0 };
 int bloco_final_x = 5, bloco_final_z = 14;
 /// matriz de ocorrência de blocos no labirinto (paredes)
 GLfloat mapa[TAM_MAPA][TAM_MAPA] = {
-		{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}, 
+		{1,0,1,1,1,1,1,1,1,1,1,1,1,1,1}, 
 		{1,0,1,0,1,0,1,0,0,0,1,0,0,0,1}, 
 		{1,0,1,0,0,0,1,1,1,0,1,1,1,0,1},
 		{1,0,0,0,1,0,1,0,1,0,0,0,0,0,1},
@@ -61,14 +53,13 @@ robot *Robot;
  * Desenha as paredes do labirinto, percorrendo a matriz de ocorrência
  * de blocos (mapa).
  * */
-void DesenhaParedes() {
+void DesenhaParedes(void) {
 	int x, z;
 	int x_mun, z_mun;
 	
 	for (x = 0; x < TAM_MAPA; x++) {
 		for (z = 0; z < TAM_MAPA; z++) {
 			if (mapa[x][z]) {
-				
 				x_mun = x * TAM_BLOCO;
 				z_mun = z * TAM_BLOCO;
 				
@@ -86,7 +77,7 @@ void DesenhaParedes() {
 /**
  * Desenha o chão do labirinto na cor verde.
  * */
-void DesenhaMapa() {
+void DesenhaMapa(void) {
 	glColor3f(0.5f, 1.0f, 0.5f);
 	
 	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, luz_chao);
@@ -115,7 +106,7 @@ void DesenhaTexto(GLfloat x, GLfloat y, GLfloat r, GLfloat g, GLfloat b, char *s
 /**
  * Função CallBack de Desenho.
  * */
-void Desenha() {	
+void Desenha(void) {	
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -132,13 +123,14 @@ void Desenha() {
 	}
 	
 	glPushMatrix();
-		DesenhaMapa();
+		DesenhaMapa(); //desenha o chão
 	glPopMatrix();
 	
 	glPushMatrix();
-		DesenhaParedes();
+		DesenhaParedes(); //desenha paredes
 	glPopMatrix();
 	
+	/* desenha o robô */
 	glPushMatrix();
 		glTranslatef(posX, 0, posZ);
 		glRotatef(180+angulo, 0, 1, 0);
@@ -146,12 +138,14 @@ void Desenha() {
 		DesenhaRobot(Robot);
 	glPopMatrix();
 	
+	/* desenha o carro */
 	glPushMatrix();
 		glTranslatef(posObj1X, 2, posObj1Z);
 		glRotatef(90, 0, 1, 0);
 		DesenhaObjeto1();
 	glPopMatrix();
 	
+	/* desenha o boneco de neve */
 	glPushMatrix();
 		glTranslatef(posObj2X, -2, posObj2Z);
 		DesenhaObjeto2();
@@ -192,6 +186,7 @@ void Desenha() {
 		glMatrixMode(GL_MODELVIEW);
 	}
 	
+	/* Desenha a janela de ajuda */
 	if (menu_help && !menu_venceu) {
 		glMatrixMode(GL_PROJECTION);
 		glPushMatrix();
@@ -232,6 +227,7 @@ void Desenha() {
 		glMatrixMode(GL_MODELVIEW);
 	}
 	
+	/* Desenha a mensagem de vitória no centro da tela */
 	if (menu_venceu) {
 		glMatrixMode(GL_PROJECTION);
 		glPushMatrix();
@@ -304,7 +300,7 @@ void MenuModo (int op) {
 void MenuPrincipal(int op){}
 
 /** Menu criado ao clicar com o botão direito do mouse na tela **/
-void CriaMenu() {
+void CriaMenu(void) {
 	int submenu1, submenu2;
 	submenu1 = glutCreateMenu(MenuCamera);
 	glutAddMenuEntry("Panoramica", 1);
@@ -338,7 +334,7 @@ void GerenciaMouse(int button, int state, int x, int y) {
 }
 
 /** Inicializa renderização de sombra e iluminação **/
-void InicializaIluminacao() {
+void InicializaIluminacao(void) {
 	glClearColor (0.0, 0.5, 1.0, 1.0);
 	glShadeModel (GL_SMOOTH);
 	
@@ -356,7 +352,7 @@ void InicializaIluminacao() {
 }
 
 /** Inicializa teste de Z-Buffer, modo de câmera e de ação **/
-void Inicializa() {
+void Inicializa(void) {
 	cam = ATRAS_ROBO;
 	modo = MANUAL;
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -384,7 +380,10 @@ void AlteraTamanhoJanela(GLsizei w, GLsizei h) {
 
 /** Retorna true se o movimento do robô não o fará colidir com um bloco
  * ou um objeto, e retorna false caso colida. */
-bool verifica_colisao_objetos (int bloco_mapa_x, int bloco_mapa_z) {	
+bool verifica_colisao_objetos (int bloco_mapa_x, int bloco_mapa_z) {
+	if (bloco_mapa_x < 0 || bloco_mapa_z < 0) 
+		return false;	
+		
 	int bloco_objeto1_x = (int) (posObj1X / TAM_BLOCO);
 	int bloco_objeto1_z = (int) (posObj1Z / TAM_BLOCO);
 	int bloco_objeto2_x = (int) (posObj2X / TAM_BLOCO);
@@ -507,7 +506,7 @@ void GerenciaTeclado(unsigned char key, int x, int y) {
 		if (key == 13) {
 			// Se estiver no menu inicial e for pressionada a tecla ENTER, libera o labirinto
 			menu_venceu = false;
-			reiniciaLabirinto();
+			ReiniciaLabirinto();
 		}
 	} else if (menu_inicial && !menu_venceu) {
 		if (key == 13) {
@@ -530,8 +529,6 @@ void move (void) {
 	//Calcula para qual bloco o robô vai após o movimento para frente
 	int bloco_mapa_x = (int) ((posX + 7*sin(angulo/rad)) / TAM_BLOCO);
 	int bloco_mapa_z = (int) ((posZ + 7*cos(angulo/rad)) / TAM_BLOCO);
-	
-	printf("posX %f posZ %f blocoX %d blocoZ %d alvoX %d alvoZ %d\n", posX, posZ, bloco_mapa_x, bloco_mapa_z, bloco_final_x, bloco_final_z);
 	
 	if (verifica_venceu(bloco_mapa_x, bloco_mapa_z))
 		menu_venceu = true;
@@ -564,9 +561,17 @@ void move_cabeca (void) {
 	else Robot->rot_cabeca -= 3;
 }
 
-
+/**
+ * Coloca o robô de volta no início do labirinto.
+ * */
 void ReiniciaLabirinto(void) {
-	
+	posX = TAM_BLOCO*1.5;
+	posZ = TAM_BLOCO*1.5;
+	modo = MANUAL;
+	cam = ATRAS_ROBO;
+	angulo = 90;
+	zoomAereo = MAX;
+	zoomRobot = 26;
 } 
 
 /**

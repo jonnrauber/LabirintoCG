@@ -2,6 +2,13 @@
  * @author JEFFERSON A. COPPINI, JONATHAN T. RAUBER
  * */
 
+#include <GL/glut.h>
+#include <stdio.h>
+#include <math.h>
+#include <stdlib.h>
+#include <time.h>
+#include <string.h>
+
 //objeto1
 #define LARGURA_MESA TAM_BLOCO
 #define ALTURA_MESA LARGURA_MESA/2.0
@@ -31,3 +38,27 @@
 #define TAM_BLOCO 20
 #define TAM_MAPA 15
 #define TAM_MUNDO 1000
+
+
+/* Cabeçalhos das funções */
+void ReiniciaLabirinto(void);
+void Timer(int a);
+void move_cabeca (void);
+void move (void);
+void GerenciaTeclado(unsigned char key, int x, int y);
+void GerenciaTecladoEspecial(int key, int x, int y);
+bool verifica_venceu (int bloco_mapa_x, int bloco_mapa_z);
+bool verifica_colisao_objetos (int bloco_mapa_x, int bloco_mapa_z);
+void AlteraTamanhoJanela(GLsizei w, GLsizei h);
+void Inicializa(void);
+void InicializaIluminacao(void);
+void GerenciaMouse(int button, int state, int x, int y);
+void CriaMenu(void);
+void MenuModo (int op);
+void MenuCamera (int op);
+void Desenha(void);
+void DesenhaTexto(GLfloat x, GLfloat y, GLfloat r, GLfloat g, GLfloat b, char *string, int font);
+void DesenhaMapa(void);
+void DesenhaParedes(void);
+void DesenhaObjeto1(void);
+void DesenhaObjeto2(void);
