@@ -658,6 +658,12 @@ void MenuCamera (int op) {
 			cam = OBJETO2;
 			break;
 		case 4:
+			cam = OBJETO3;
+			break;
+		case 5:
+			cam = PARQUE;
+			break;
+		case 6:
 			cam = ATRAS_ROBO;
 			break;
 	}
@@ -684,7 +690,9 @@ void CriaMenu(void) {
 	glutAddMenuEntry("Panoramica", 1);
 	glutAddMenuEntry("Objeto 1", 2);
 	glutAddMenuEntry("Objeto 2", 3);
-	glutAddMenuEntry("Atras do Robo", 4);
+	glutAddMenuEntry("Objeto 3", 4);
+	glutAddMenuEntry("Parque", 5);
+	glutAddMenuEntry("Atras do Robo", 6);
 	submenu2 = glutCreateMenu(MenuModo);
 	glutAddMenuEntry("Manual", 1);
 	glutAddMenuEntry("Automatico", 2);
@@ -1097,7 +1105,10 @@ void move (void) {
 	if (verifica_venceu(bloco_mapa_x, bloco_mapa_z))
 		menu_venceu = true;
 
-	if (mapa[bloco_mapa_x][bloco_mapa_z] != 1 && verifica_colisao_objetos(bloco_mapa_x, bloco_mapa_z)) {
+	if (mapa[bloco_mapa_x][bloco_mapa_z] != 1 &&
+		((posX + sin(angulo/rad)) >= TAM_BLOCO/2.0) &&
+		((posZ + cos(angulo/rad)) >= TAM_BLOCO/2.0) &&
+		verifica_colisao_objetos(bloco_mapa_x, bloco_mapa_z)) {
 		/* Se não colidir com algum bloco de parede ou com algum objeto,
 		 * faz o movimento do robô para frente. */
 		posX += sin(angulo/rad);
